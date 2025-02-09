@@ -1,3 +1,8 @@
+## PennyWise
+
+PennyWise is a Personal Budget and Expense Tracker designed to help users manage their finances effectively. It allows users to Create, Read, Update, and Delete (CRUD) expenses across multiple categories. The application provides a Pie Chart for visualizing the percentage of expenses in each category, helping users understand their spending habits. Additionally, it includes a Currency Converter that supports multiple global currencies, enabling users to track expenses in their preferred currency.
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
@@ -20,17 +25,33 @@ You can start editing the page by modifying `app/page.js`. The page auto-updates
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+## Expense Management (CRUD Operations):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Add new expenses with details like description, amount, category, currency, and date.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Edit or delete existing expenses.
 
-## Deploy on Vercel
+View all expenses in a tabular format.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Pie Chart Visualization:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Visualize expenses by category using a pie chart.
+
+Each category is represented with a unique color for better clarity.
+
+## Currency Converter:
+
+Supports multiple currencies (e.g.,INR , USD, EUR, GBP, JPY).
+
+Converts expenses to a user-selected base currency for consistent tracking.
+
+## Line Chart for Trends:
+
+Displays expense trends over time using a line chart.
+
+Helps users identify spending patterns.
+
+## Local Storage Integration:
+
+Saves expenses to the browser's local storage for persistence across sessions.
