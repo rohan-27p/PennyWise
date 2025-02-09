@@ -22,8 +22,39 @@ const ExpenseTracker = () => {
   const [totalByCategory, setTotalByCategory] = useState({});
 
   // Categories and their colors for the pie chart
-  const categories = ['food', 'transport', 'utilities', 'entertainment', 'other'];
-  const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
+ const categories = [
+    'food',
+    'transport',
+    'utilities',
+    'entertainment',
+    'housing',
+    'healthcare',
+    'shopping',
+    'education',
+    'travel',
+    'fitness',
+    'gifts',
+    'insurance',
+    'savings',
+    'other'
+  ];
+  
+  const colors = [
+    '#FF6B6B', // food - coral red
+    '#4ECDC4', // transport - turquoise
+    '#45B7D1', // utilities - sky blue
+    '#96CEB4', // entertainment - sage green
+    '#FF9F43', // housing - orange
+    '#E84393', // healthcare - pink
+    '#A363D9', // shopping - purple
+    '#3498DB', // education - blue
+    '#F1C40F', // travel - yellow
+    '#2ECC71', // fitness - green
+    '#E74C3C', // gifts - red
+    '#34495E', // insurance - navy
+    '#1ABC9C', // savings - teal
+    '#95A5A6'  // other - gray
+  ];
 
   useEffect(() => {
     // Load expenses from localStorage
