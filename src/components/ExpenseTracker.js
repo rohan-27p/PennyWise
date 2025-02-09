@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'; // Updated Select component
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { Plus, Trash2, Edit2, Save } from 'lucide-react';
 
@@ -22,39 +22,8 @@ const ExpenseTracker = () => {
   const [totalByCategory, setTotalByCategory] = useState({});
 
   // Categories and their colors for the pie chart
- const categories = [
-    'food',
-    'transport',
-    'utilities',
-    'entertainment',
-    'housing',
-    'healthcare',
-    'shopping',
-    'education',
-    'travel',
-    'fitness',
-    'gifts',
-    'insurance',
-    'savings',
-    'other'
-  ];
-  
-  const colors = [
-    '#FF6B6B', // food - coral red
-    '#4ECDC4', // transport - turquoise
-    '#45B7D1', // utilities - sky blue
-    '#96CEB4', // entertainment - sage green
-    '#FF9F43', // housing - orange
-    '#E84393', // healthcare - pink
-    '#A363D9', // shopping - purple
-    '#3498DB', // education - blue
-    '#F1C40F', // travel - yellow
-    '#2ECC71', // fitness - green
-    '#E74C3C', // gifts - red
-    '#34495E', // insurance - navy
-    '#1ABC9C', // savings - teal
-    '#95A5A6'  // other - gray
-  ];
+  const categories = ['food', 'transport', 'utilities', 'entertainment', 'other'];
+  const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
 
   useEffect(() => {
     // Load expenses from localStorage
@@ -74,16 +43,16 @@ const ExpenseTracker = () => {
   }, [expenses, baseCurrency]);
 
   const fetchExchangeRates = async () => {
-  try {
-    const response = await fetch(
-      `https://openexchangerates.org/api/latest.json?app_id=4f010fdf17fb4b50aa6441b3a015c379&base=USD`
-    );
-    const data = await response.json();
-    setExchangeRates(data.rates);
-  } catch (error) {
-    console.error('Error fetching exchange rates:', error);
-  }
-};
+    try {
+      const response = await fetch(
+        `https://openexchangerates.org/api/latest.json?app_id=4f010fdf17fb4b50aa6441b3a015c379&base=USD`
+      );
+      const data = await response.json();
+      setExchangeRates(data.rates);
+    } catch (error) {
+      console.error('Error fetching exchange rates:', error);
+    }
+  };
 
   const convertCurrency = (amount, fromCurrency, toCurrency) => {
     if (!exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) return amount;
@@ -107,9 +76,29 @@ const ExpenseTracker = () => {
     setTotalByCategory(totals);
   };
 
+  // Prepare data for the line chart
+  const prepareLineChartData = () => {
+    const dataByDate = {};
+
+    expenses.forEach(expense => {
+      const date = expense.date;
+      const amount = convertCurrency(expense.amount, expense.currency, baseCurrency);
+
+      if (!dataByDate[date]) {
+        dataByDate[date] = 0;
+      }
+      dataByDate[date] += amount;
+    });
+
+    return Object.entries(dataByDate).map(([date, total]) => ({
+      date,
+      total: parseFloat(total.toFixed(2))
+    }));
+  };
+
   const handleAddExpense = () => {
     if (!newExpense.description || !newExpense.amount) return;
-    
+
     setExpenses([
       ...expenses,
       {
@@ -118,7 +107,7 @@ const ExpenseTracker = () => {
         amount: parseFloat(newExpense.amount)
       }
     ]);
-    
+
     setNewExpense({
       description: '',
       amount: '',
@@ -131,16 +120,16 @@ const ExpenseTracker = () => {
   const handleEditExpense = (id) => {
     const expense = expenses.find(e => e.id === id);
     if (!expense) return;
-    
+
     setEditingId(id);
     setNewExpense(expense);
   };
 
   const handleUpdateExpense = () => {
-    setExpenses(expenses.map(expense => 
+    setExpenses(expenses.map(expense =>
       expense.id === editingId ? { ...newExpense, id: editingId } : expense
     ));
-    
+
     setEditingId(null);
     setNewExpense({
       description: '',
@@ -161,6 +150,8 @@ const ExpenseTracker = () => {
     value: amount
   }));
 
+  const lineChartData = prepareLineChartData();
+
   return (
     <div className="w-full max-w-6xl mx-auto p-4 space-y-6">
       <Card>
@@ -173,40 +164,50 @@ const ExpenseTracker = () => {
               <Input
                 placeholder="Description"
                 value={newExpense.description}
-                onChange={(e) => setNewExpense({...newExpense, description: e.target.value})}
+                onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
               />
               <Input
                 type="number"
                 placeholder="Amount"
                 value={newExpense.amount}
-                onChange={(e) => setNewExpense({...newExpense, amount: e.target.value})}
+                onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
               />
-              <select
-                className="w-full p-2 border rounded"
+              <Select
                 value={newExpense.category}
-                onChange={(e) => setNewExpense({...newExpense, category: e.target.value})}
+                onValueChange={(value) => setNewExpense({ ...newExpense, category: value })}
               >
-                {categories.map(category => (
-                  <option key={category} value={category}>
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="w-full p-2 border rounded"
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map(category => (
+                    <SelectItem key={category} value={category}>
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
                 value={newExpense.currency}
-                onChange={(e) => setNewExpense({...newExpense, currency: e.target.value})}
+                onValueChange={(value) => setNewExpense({ ...newExpense, currency: value })}
               >
-                {Object.keys(exchangeRates).map(currency => (
-                  <option key={currency} value={currency}>{currency}</option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(exchangeRates).map(currency => (
+                    <SelectItem key={currency} value={currency}>
+                      {currency}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Input
                 type="date"
                 value={newExpense.date}
-                onChange={(e) => setNewExpense({...newExpense, date: e.target.value})}
+                onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
               />
-              <Button 
+              <Button
                 className="w-full"
                 onClick={editingId ? handleUpdateExpense : handleAddExpense}
               >
@@ -216,17 +217,21 @@ const ExpenseTracker = () => {
             </div>
 
             <div>
-              <select
-                className="w-full p-2 border rounded mb-4"
+              <Select
                 value={baseCurrency}
-                onChange={(e) => setBaseCurrency(e.target.value)}
+                onValueChange={(value) => setBaseCurrency(value)}
               >
-                {Object.keys(exchangeRates).map(currency => (
-                  <option key={currency} value={currency}>
-                    Display in {currency}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select base currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(exchangeRates).map(currency => (
+                    <SelectItem key={currency} value={currency}>
+                      Display in {currency}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               <PieChart width={300} height={300}>
                 <Pie
@@ -248,7 +253,26 @@ const ExpenseTracker = () => {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Line Chart */}
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold mb-4">Expense Trends Over Time</h2>
+            <LineChart
+              width={600}
+              height={300}
+              data={lineChartData}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="total" stroke="#8884d8" activeDot={{ r: 8 }} />
+            </LineChart>
+          </div>
+
+          {/* Expense Table */}
+          <div className="overflow-x-auto mt-6">
             <table className="w-full">
               <thead>
                 <tr>
