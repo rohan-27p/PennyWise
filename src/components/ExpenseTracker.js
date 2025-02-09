@@ -238,8 +238,8 @@ const ExpenseTracker = () => {
                   data={pieChartData}
                   dataKey="value"
                   nameKey="name"
-                  cx="50%"
-                  cy="50%"
+                  cx="55%"
+                  cy="55%"
                   outerRadius={100}
                   label
                 >
