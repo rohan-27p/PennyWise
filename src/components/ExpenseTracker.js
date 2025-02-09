@@ -7,7 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart
 import { Plus, Trash2, Edit2, Save } from 'lucide-react';
 
 const ExpenseTracker = () => {
-  // State management
+  // the state of the expenses
   const [expenses, setExpenses] = useState([]);
   const [newExpense, setNewExpense] = useState({
     description: '',
@@ -21,29 +21,29 @@ const ExpenseTracker = () => {
   const [exchangeRates, setExchangeRates] = useState({});
   const [totalByCategory, setTotalByCategory] = useState({});
 
-  // Categories and their colors for the pie chart
+  // categories for pie chart along with color mapping (should I add more categories?)
   const categories = ['food', 'transport', 'utilities', 'entertainment', 'other'];
   const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
 
   useEffect(() => {
-    // Load expenses from localStorage
+    // local storage to save the expenses for now, will update to a database later (maybe supabase)
     const savedExpenses = localStorage.getItem('expenses');
     if (savedExpenses) {
       setExpenses(JSON.parse(savedExpenses));
     }
 
-    // Fetch exchange rates (mock implementation)
     fetchExchangeRates();
   }, []);
 
   useEffect(() => {
-    // Save expenses to localStorage whenever they change
+    // save the expenses to local storage
     localStorage.setItem('expenses', JSON.stringify(expenses));
     calculateTotalsByCategory();
   }, [expenses, baseCurrency]);
 
   const fetchExchangeRates = async () => {
     try {
+      //shit the api key is public, should use a private key later
       const response = await fetch(
         `https://openexchangerates.org/api/latest.json?app_id=4f010fdf17fb4b50aa6441b3a015c379&base=USD`
       );
@@ -53,12 +53,12 @@ const ExpenseTracker = () => {
       console.error('Error fetching exchange rates:', error);
     }
   };
-
+   // just a simple currency converter (high level meth!)
   const convertCurrency = (amount, fromCurrency, toCurrency) => {
     if (!exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) return amount;
     return (amount * exchangeRates[toCurrency]) / exchangeRates[fromCurrency];
   };
-
+  // this is the total of the expenses by category
   const calculateTotalsByCategory = () => {
     const totals = {};
     categories.forEach(category => {
@@ -76,7 +76,7 @@ const ExpenseTracker = () => {
     setTotalByCategory(totals);
   };
 
-  // Prepare data for the line chart
+  // this is the data for the line chart
   const prepareLineChartData = () => {
     const dataByDate = {};
 
@@ -98,7 +98,7 @@ const ExpenseTracker = () => {
 
   const handleAddExpense = () => {
     if (!newExpense.description || !newExpense.amount) return;
-
+    // add the new expense to the expenses
     setExpenses([
       ...expenses,
       {
@@ -107,7 +107,7 @@ const ExpenseTracker = () => {
         amount: parseFloat(newExpense.amount)
       }
     ]);
-
+    // reset the new expense
     setNewExpense({
       description: '',
       amount: '',
@@ -116,7 +116,7 @@ const ExpenseTracker = () => {
       date: new Date().toISOString().split('T')[0]
     });
   };
-
+    
   const handleEditExpense = (id) => {
     const expense = expenses.find(e => e.id === id);
     if (!expense) return;
@@ -144,7 +144,7 @@ const ExpenseTracker = () => {
     setExpenses(expenses.filter(expense => expense.id !== id));
   };
 
-  // Prepare data for charts
+  // applee pieee chart data
   const pieChartData = Object.entries(totalByCategory).map(([category, amount]) => ({
     name: category,
     value: amount
